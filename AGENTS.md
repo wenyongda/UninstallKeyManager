@@ -45,7 +45,8 @@ dotnet publish -c Release -p:Platform=x64
 
 - **Solution format**: `.slnx` (new XML format, not legacy `.sln`)
 - **Target framework**: `net10.0-windows10.0.19041.0`
-- **Capabilities**: `runFullTrust`, `systemAIModels`
+- **Capabilities**: `runFullTrust`, `unvirtualizedResources`, `systemAIModels`
+- **Registry write virtualization**: MUST stay disabled. `desktop6:RegistryWriteVirtualization=disabled` in `Package.appxmanifest` (with the `unvirtualizedResources` restricted capability) is what lets the packaged build write to the real `HKCU`. Without it MSIX redirects HKCU writes into `%LOCALAPPDATA%\Packages\<PFN>\SystemAppData\Helium\User.dat`, the app's own read-back still succeeds, and Control Panel never sees the change.
 - **Publish**: SelfContained=True, PublishReadyToRun=True (Release), PublishTrimmed=True (Release)
 
 ## WinUI 3 Conventions

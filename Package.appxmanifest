@@ -1,12 +1,13 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 
 <Package
   xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
   xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest"
   xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
   xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
+  xmlns:desktop6="http://schemas.microsoft.com/appx/manifest/desktop/windows10/6"
   xmlns:systemai="http://schemas.microsoft.com/appx/manifest/systemai/windows10"
-  IgnorableNamespaces="uap rescap systemai">
+  IgnorableNamespaces="uap rescap desktop6 systemai">
 
   <Identity
     Name="0d665697-b570-4370-ad04-eadd1b40ba85"
@@ -19,6 +20,18 @@
     <DisplayName>UninstallKeyManager</DisplayName>
     <PublisherDisplayName>yun</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
+
+    <!--
+      An MSIX package gets its HKEY_CURRENT_USER writes redirected into a private
+      per-package hive (SystemAppData\Helium\User.dat) that only the package can
+      see. Reads are merged with the real HKCU, so the app would still read back
+      the value it just "wrote" and report success, while Control Panel - an
+      ordinary unpackaged process - never sees the change and keeps listing the
+      application. Disabling registry write virtualization is what makes the
+      packaged build behave like the unpackaged one. Requires the
+      unvirtualizedResources restricted capability declared below.
+    -->
+    <desktop6:RegistryWriteVirtualization>disabled</desktop6:RegistryWriteVirtualization>
   </Properties>
 
   <Dependencies>
@@ -48,6 +61,13 @@
 
   <Capabilities>
     <rescap:Capability Name="runFullTrust" />
+
+    <!--
+      Required by desktop6:RegistryWriteVirtualization. This is a restricted
+      capability: sideloading and Visual Studio deployment accept it, a Store
+      submission has to justify it.
+    -->
+    <rescap:Capability Name="unvirtualizedResources" />
     <systemai:Capability Name="systemAIModels"/>
   </Capabilities>
 </Package>

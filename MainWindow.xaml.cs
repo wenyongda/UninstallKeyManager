@@ -39,6 +39,13 @@ namespace UninstallKeyManager
         private ScanResult _scanResult = new();
 
         /// <summary>
+        /// True when the MSIX package still redirects HKCU writes into its private
+        /// hive, which makes every write succeed locally and change nothing that
+        /// Control Panel can see.
+        /// </summary>
+        private readonly bool _registryWritesVirtualized = AdminService.IsRegistryWriteVirtualized();
+
+        /// <summary>
         /// Guards <see cref="HideSwitch_Toggled"/> against the Toggled events that
         /// the programmatic switch updates raise while a write is in flight.
         /// </summary>
@@ -318,6 +325,11 @@ namespace UninstallKeyManager
             if (_scanResult.SkippedWithoutDisplayName > 0)
             {
                 notes.Add($"跳过 {_scanResult.SkippedWithoutDisplayName} 个无名称项");
+            }
+
+            if (_registryWritesVirtualized)
+            {
+                notes.Add("⚠ 打包模式仍启用注册表虚拟化，修改不会写入真实注册表");
             }
 
             ScanNote = notes.Count > 0 ? string.Join(" · ", notes) : string.Empty;
