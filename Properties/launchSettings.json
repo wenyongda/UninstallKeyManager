@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "UninstallKeyManager (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "UninstallKeyManager (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}
